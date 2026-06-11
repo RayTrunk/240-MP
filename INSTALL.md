@@ -6,7 +6,7 @@ The following steps will set up an image for your Raspberry Pi with the latest v
 
 ### Requirements
 
-- A RaspberryPi [4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/), [3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/) or [3B](https://www.raspberrypi.com/products/raspberry-pi-3-model-b/) - These are the only models I've tested with, it may work on others but sorry I can't say for sure
+- A RaspberryPi [4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) or [3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/) - These are the only models I've tested with, it may work on others but sorry I can't say for sure
 - SD Card (minimum of 4GB)
 - Internet Access (either WiFi or network cable will work)
 
@@ -27,118 +27,116 @@ The following steps will set up an image for your Raspberry Pi with the latest v
     | --- | --- |
     | <img src="https://github.com/user-attachments/assets/bb9f7a47-12b7-4580-abf4-ec8ad22153ba" /> | <img src="https://github.com/user-attachments/assets/30c39fce-99f8-48c9-9ad0-2b39b52690c1" /> |
 
-2) After the write is complete, reconnect the card to your PC and update your boot/config.txt to one of the following:
+2) After the write is complete, reconnect the card to your PC and update your boot/config.txt to one of the following (please make sure to choose the one that best matches your TV):
 
-    <details>
-        <summary>For composite out on a CRT TV (NTSC)...</summary>
-        
-        # --- Global ---
+    **Option 1: For composite out on a CRT TV (NTSC)...**
+    ```
+    # --- Global ---
 
-        arm_64bit=1
-        disable_fw_kms_setup=1
-        disable_splash=1
-        disable_overscan=1
-        dtparam=audio=on
-        
-        # Composite
-        enable_tvout=1
-        sdtv_mode=0
-        sdtv_aspect=1
-        
-        # --- Pi 4B ---
-        [pi4]
-        
-        # Drivers & Video
-        dtoverlay=vc4-fkms-v3d,cma-256
-        dtoverlay=rpivid-v4l2
-        
-        # Overclocking
-        over_voltage=2
-        arm_freq=1750
-        gpu_freq=600
-        
-        # --- Pi 3B ---
-        [pi3]
-        
-        # Drivers & Video
-        dtoverlay=vc4-fkms-v3d,cma-256
-        
-        # Overclocking
-        over_voltage=4
-        arm_freq=1300
-        core_freq=450
-        sdram_freq=500
-        
-        # --- Pi 3B+ ---
-        [pi3+]
-        
-        # Drivers & Video
-        dtoverlay=vc4-fkms-v3d,cma-256
-        
-        # Overclocking
-        over_voltage=2
-        arm_freq=1500
-        core_freq=500
-        sdram_freq=500
-        
-        # --- Global ---
-        [all]
-    </details>
+    arm_64bit=1
+    disable_fw_kms_setup=1
+    disable_splash=1
+    disable_overscan=1
+    dtparam=audio=on
+    
+    # Composite
+    enable_tvout=1
+    sdtv_mode=0
+    sdtv_aspect=1
+    
+    # --- Pi 4B ---
+    [pi4]
+    
+    # Drivers & Video
+    dtoverlay=vc4-fkms-v3d,cma-256
+    dtoverlay=rpivid-v4l2
+    
+    # Overclocking
+    over_voltage=2
+    arm_freq=1750
+    gpu_freq=600
+    
+    # --- Pi 3B ---
+    [pi3]
+    
+    # Drivers & Video
+    dtoverlay=vc4-fkms-v3d,cma-256
+    
+    # Overclocking
+    over_voltage=4
+    arm_freq=1300
+    core_freq=450
+    sdram_freq=500
+    
+    # --- Pi 3B+ ---
+    [pi3+]
+    
+    # Drivers & Video
+    dtoverlay=vc4-fkms-v3d,cma-256
+    
+    # Overclocking
+    over_voltage=2
+    arm_freq=1500
+    core_freq=500
+    sdram_freq=500
+    
+    # --- Global ---
+    [all]
+    ```
 
-    <details>
-        <summary>For HDMI out...</summary>
+    or **Option 2: for HDMI out on a modern TV...**
+    ```
+    # --- Global ---
 
-        # --- Global ---
+    arm_64bit=1
+    disable_fw_kms_setup=1
+    disable_splash=1
+    disable_overscan=1
+    dtparam=audio=on
 
-        arm_64bit=1
-        disable_fw_kms_setup=1
-        disable_splash=1
-        disable_overscan=1
-        dtparam=audio=on
+    # HDMI
+    display_auto_detect=1
+    hdmi_force_hotplug=1
 
-        # HDMI
-        display_auto_detect=1
-        hdmi_force_hotplug=1
-
-        # --- Pi 4B ---
-        [pi4]
-        
-        # Drivers & Video
-        dtoverlay=vc4-fkms-v3d,cma-256
-        dtoverlay=rpivid-v4l2
-        
-        # Overclocking
-        over_voltage=2
-        arm_freq=1750
-        gpu_freq=600
-        
-        # --- Pi 3B ---
-        [pi3]
-        
-        # Drivers & Video
-        dtoverlay=vc4-fkms-v3d,cma-256
-        
-        # Overclocking
-        over_voltage=4
-        arm_freq=1300
-        core_freq=450
-        sdram_freq=500
-        
-        # --- Pi 3B+ ---
-        [pi3+]
-        
-        # Drivers & Video
-        dtoverlay=vc4-fkms-v3d,cma-256
-        
-        # Overclocking
-        over_voltage=2
-        arm_freq=1500
-        core_freq=500
-        sdram_freq=500
-        
-        # --- Global ---
-        [all]
-    </details>
+    # --- Pi 4B ---
+    [pi4]
+    
+    # Drivers & Video
+    dtoverlay=vc4-fkms-v3d,cma-256
+    dtoverlay=rpivid-v4l2
+    
+    # Overclocking
+    over_voltage=2
+    arm_freq=1750
+    gpu_freq=600
+    
+    # --- Pi 3B ---
+    [pi3]
+    
+    # Drivers & Video
+    dtoverlay=vc4-fkms-v3d,cma-256
+    
+    # Overclocking
+    over_voltage=4
+    arm_freq=1300
+    core_freq=450
+    sdram_freq=500
+    
+    # --- Pi 3B+ ---
+    [pi3+]
+    
+    # Drivers & Video
+    dtoverlay=vc4-fkms-v3d,cma-256
+    
+    # Overclocking
+    over_voltage=2
+    arm_freq=1500
+    core_freq=500
+    sdram_freq=500
+    
+    # --- Global ---
+    [all]
+    ```
 
 3) Place the SD card in your Raspberry Pi and let it run through its first boot sequence
 
@@ -162,7 +160,22 @@ The following steps will set up an image for your Raspberry Pi with the latest v
 
     If you choose that option please make sure to enter your primary user for the pi at the next prompt.  If you don't provide one it will set it up for the `Pi` user.
 
-At this point you can type `240mp` to start up the app.  When you quit the app it will automatically shutdown your Pi and if you chose to install the autostart service then the next time you boot your Pi it will boot into 240-MP.
+    At this point you can type `240mp` to start up the app.  If you chose to install the autostart service then the next time you boot your Pi it will boot directly into 240-MP.
+
+### Update
+
+To update to the latest release on Raspberry Pi please follow these steps (your settings will be retained):
+
+1) SSH into your Raspberry Pi
+2) Re-run the install script
+    ```bash
+    bash <(curl -fsSL https://github.com/anthonycaccese/240-mp/releases/latest/download/install.sh)
+    ```
+3) When it asks to `Install systemd autostart service? [y/N]`
+    - if you already have autostart set up you can press either Y or N, it will keep your current autostart
+    - if you don't have autostart installed and want to keep it that way just answer N
+    - and if you want to turn on autostart just answer Y
+4) Once that completes just run `sudo reboot` and when your pi restarts you'll be on the latest version
 
 ### Uninstall
 
@@ -194,9 +207,15 @@ If you don't have a Raspberry Pi and would like to try 240-MP, I also provide a 
 ### Steps
 
 1. Download the DMG archive from the latest release
-2. Mount it and move the 240mp.app into your Applicaitons folder
+2. Mount it and move the 240mp.app into your Applications folder
 3. Make sure you have mpv installed (240-MP requires MPV for playback): `brew install mpv`
 4. Double click 240-MP and it should open full screen
+
+### Update
+
+To update to the latest release on MacOS please follow these steps (your settings will be retained):
+1. Download the DMG archive from the latest release
+2. Mount it and move the 240mp.app into your Applications folder to overwrite your existing version. *Your existing configuration settings will be retained and it's safe to overwrite*
 
 ### Uninstall
 

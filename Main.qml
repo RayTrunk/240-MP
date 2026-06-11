@@ -48,6 +48,20 @@ Window {
             "tertiary": "#df9c27",
             "surface": "#FAF5E8",
             "accent": "#EE442F"
+        },
+        "Amber": {
+            "primary": "#FFB000",
+            "secondary": "#B37B00",
+            "tertiary": "#B37B00",
+            "surface": "#000000",
+            "accent": "#FFEE11"
+        },
+        "Kinescope": {
+            "primary": "#FFFFFF",
+            "secondary": "#9E9E9E",
+            "tertiary": "#424242",
+            "surface": "#121212",
+            "accent": "#FFFFFF"
         }
     })
     property var allThemes: themes  // may gain a "Custom" entry on startup

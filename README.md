@@ -4,7 +4,7 @@
 
 240-MP is a retro VCR style frontend to play content on Raspberry Pi (preferably hooked up to a CRT TV). 
 
-Playback experiences are handled via modules to enable new integrations without requiring major changes to the overall frontend. There are 2 currently included playback modules; one for [Local Files](https://github.com/anthonycaccese/240-MP/wiki/Module:-Local-Files) and one for [Plex](https://github.com/anthonycaccese/240-MP/wiki/Module:-Plex).
+Playback experiences are handled via modules to enable new integrations without requiring major changes to the overall frontend. There are 3 currently included playback modules; one for [Local Files](https://github.com/anthonycaccese/240-MP/wiki/Module:-Local-Files), one for [Plex](https://github.com/anthonycaccese/240-MP/wiki/Module:-Plex) and a module similar to art/wallpaper modes on modern tvs called ([Ambient:Mode](https://github.com/anthonycaccese/240-MP/wiki/Module:-Ambient-Mode))
 
 It's built to work in conjuction with MPV which will be installed (or updated) as a dependency during the [install](#Install) steps outlined below.
 
@@ -46,6 +46,12 @@ Watch on YouTube: https://youtu.be/r-gylGDoELY
 - Show/Season browsing
 - Video quality selection: Direct Playback (Default) or Transcode options
 
+### Ambient:Mode Module ([Wiki](https://github.com/anthonycaccese/240-MP/wiki/Module:-Ambient-Mode))
+- Supported video file types: `"mp4", "mkv", "avi", "mov", "m4v", "webm", "wmv", "flv", "f4v", "mpg", "mpeg", "vob"`
+- Playlist support for audio tracks using `m3u` and `m3u8` files
+- Mix video with a different audio track
+- Loops forever until you stop it
+
 ## Install 
 
 - [On a Raspberry Pi](INSTALL.md#on-a-raspberry-pi)
@@ -62,11 +68,14 @@ Watch on YouTube: https://youtu.be/r-gylGDoELY
 - Will this work on other Raspberry Pi models? (like the 5, 2 zero, etc...)
     - Sorry, I can't say for sure as I've only tested on the 4b, 3b+ and 3b and don't have plans to test on other devices at this time.
 - Where does the name "240-MP" come from?
-    - 240 has a double meaning referring to the longest [VHS tape length](https://en.wikipedia.org/wiki/VHS#Tape_lengths) and my primary display target for it of [CRT TVs](https://consolemods.org/wiki/CRT:What_is_240p%3F)
+    - 240 has a double meaning referring to the longest [VHS tape length](https://en.wikipedia.org/wiki/VHS#Tape_lengths) and my primary display target for it of [CRT TVs](https://consolemods.org/wiki/CRT:What_is_240p%3F).
     - MP also has a double meaning of "Media Player" and a play on the "SP/LP/EP/SLP" terminology that was used to refer to the recording quality for VHS recordings.
+- Does the 240 in the name mean that it outputs at 240p resolution?
+    - No and I apologize for any confusion I've caused on this, it's 240 in name only.
+    - The output resolution for the menu and video playback when using it on a CRT is 480i.
 - Does 240-MP work over HDMI on a modern television too?
     - Yes! The UI was built to scale on modern televisions over HDMI as well.
-    - Please make sure you use the config.txt I provide for HDMI instead of CRT.
+    - Please make sure you use the config.txt I provide for HDMI and it will output at the proper resolution for a modern tv.
 
 ## Credits & Acknowledgments 
 
