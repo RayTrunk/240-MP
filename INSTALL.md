@@ -6,14 +6,14 @@ The following steps will set up an image for your Raspberry Pi with the latest v
 
 ### Requirements
 
-- A RaspberryPi [4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) or [3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/) - These are the only models I've tested with, it may work on others but sorry I can't say for sure
+- A RaspberryPi [4](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) or [3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/) - These are the models I've tested most and are my recommendation. The [5](https://www.raspberrypi.com/products/raspberry-pi-5/) also works but **over HDMI only** — the Pi 5 has no composite output, so it can't drive a CRT. It may work on other models too but sorry I can't say for sure
 - SD Card (minimum of 4GB)
 - A keyboard to navigate
 - Internet Access (either WiFi or network cable will work)
 
 ### Optional
 
-- A CRT TV and a composite cable - Composite out is my recommended way to use 240-MP but it will also work over HDMI as well so just select the config that works for your setup in step 2 below.  This is the composite cable I use if you happen to have a CRT: https://www.adafruit.com/product/2881
+- A CRT TV and a composite cable - Composite out is my recommended way to use 240-MP but it will also work over HDMI as well so just select the config that works for your setup in step 2 below.  This is the composite cable I use if you happen to have a CRT: https://www.adafruit.com/product/2881 (note: composite is only available on the Pi 3/4 — the Pi 5 is HDMI-only.)
 - USB remote control - Keyboard input works well but if you want that experience of sitting back and playing video on a VCR then a remote will definitely help with that.  I use this one: https://www.amazon.com/dp/B01FVUGPE8
 - USB game controller - Most controllers (Xbox, PlayStation, 8BitDo, NES-style, etc.) should work out of the box: D-pad/left stick to navigate, A to select, B to go back, Start for play/pause.  Controllers can be plugged in at any time, and the button mapping can be customized — see [BUILDING.md → Gamepad input](BUILDING.md#gamepad-input-inputcfg).  If a controller isn't detected, make sure your user is in the `input` group: `sudo usermod -aG input $USER` then reboot.
 
@@ -135,6 +135,13 @@ The following steps will set up an image for your Raspberry Pi with the latest v
     arm_freq=1500
     core_freq=500
     sdram_freq=500
+    
+    # --- Pi 5 ---
+    [pi5]
+    
+    # Drivers & Video (Pi 5 requires full KMS — fkms is not supported, and
+    # there is no hardware H.264 block so video uses fast software decode)
+    dtoverlay=vc4-kms-v3d
     
     # --- Global ---
     [all]

@@ -89,6 +89,32 @@ else
     QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-eglfs}"
     export QT_QPA_EGLFS_ALWAYS_SET_MODE=1
     export QT_QPA_EGLFS_KMS_ATOMIC=1
+
+    # Point Qt EGLFS at the DRM card that has a real display pipeline. Render-
+    # only nodes (v3d) have no connector dirs under /sys/class/drm and make Qt
+    # fail with "drmModeGetResources failed (Operation not supported)". On
+    # Pi3B+/Pi4 the display card happens to be card0 (auto-pick works), but on
+    # Pi5 the v3d render node often enumerates first, so we must select the
+    # right card explicitly. Prefer a connected connector; fall back to the
+    # first card that has any connector at all.
+    KMS_CARD=""
+    for s in /sys/class/drm/card*-*/status; do
+        [ -e "$s" ] || continue
+        if [ "$(cat "$s")" = "connected" ]; then
+            n=$(basename "$(dirname "$s")"); KMS_CARD="${n%%-*}"; break
+        fi
+    done
+    if [ -z "$KMS_CARD" ]; then
+        for d in /sys/class/drm/card*-*; do
+            [ -e "$d" ] || continue
+            n=$(basename "$d"); KMS_CARD="${n%%-*}"; break
+        done
+    fi
+    if [ -n "$KMS_CARD" ] && [ -e "/dev/dri/$KMS_CARD" ]; then
+        KMS_CONF="${XDG_RUNTIME_DIR:-/tmp}/240mp-kms.json"
+        printf '{ "device": "/dev/dri/%s" }\n' "$KMS_CARD" > "$KMS_CONF"
+        export QT_QPA_EGLFS_KMS_CONFIG="$KMS_CONF"
+    fi
 fi
 
 export QT_QPA_PLATFORM
@@ -118,6 +144,7 @@ SupplementaryGroups=tty video input
 AmbientCapabilities=CAP_SYS_TTY_CONFIG
 Environment=QT_QPA_PLATFORM=eglfs
 Environment=QT_QPA_EGLFS_ALWAYS_SET_MODE=1
+Environment=QT_QPA_EGLFS_KMS_ATOMIC=1
 Environment=QML2_IMPORT_PATH=/usr/lib/aarch64-linux-gnu/qt6/qml
 ExecStart=${LAUNCHER}
 Restart=on-failure
