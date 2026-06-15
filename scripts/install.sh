@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────────────────
-# 240-MP installer for Raspberry Pi OS Trixie (arm64)
+# 240-MP installer for Debian/Ubuntu on x86_64 and arm64
 #
 # Usage:
 #   bash install.sh             # install latest release
@@ -8,10 +8,29 @@
 # ──────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-REPO="anthonycaccese/240-mp"          # ← update before first release
+REPO="RayTrunk/240-MP"
 INSTALL_DIR="/opt/240mp"
 LAUNCHER="/usr/local/bin/240mp"
 SYSTEMD_SERVICE="/etc/systemd/system/240mp.service"
+
+# ── Detect architecture ────────────────────────────────────────────────────────
+ARCH=$(uname -m)
+case "$ARCH" in
+    x86_64)
+        LINUX_ARCH="x86_64"
+        QML_LIB_PATH="/usr/lib/x86_64-linux-gnu/qt6/qml"
+        ;;
+    aarch64)
+        LINUX_ARCH="arm64"
+        QML_LIB_PATH="/usr/lib/aarch64-linux-gnu/qt6/qml"
+        ;;
+    *)
+        echo "Error: unsupported architecture: $ARCH"
+        echo "Supported: x86_64, aarch64 (arm64)"
+        exit 1
+        ;;
+esac
+echo "Detected architecture: $ARCH"
 
 # ── Resolve version ────────────────────────────────────────────────────────────
 VERSION="${1:-latest}"
@@ -23,15 +42,8 @@ if [ "$VERSION" = "latest" ]; then
 fi
 echo "Installing 240-MP ${VERSION}"
 
-TARBALL="240-MP-${VERSION}-linux-arm64.tar.gz"
+TARBALL="240-MP-${VERSION}-linux-${LINUX_ARCH}.tar.gz"
 DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${TARBALL}"
-
-# ── Verify architecture ────────────────────────────────────────────────────────
-ARCH=$(uname -m)
-if [ "$ARCH" != "aarch64" ]; then
-    echo "Error: this installer is for arm64 (aarch64). Detected: $ARCH"
-    exit 1
-fi
 
 # ── Install runtime dependencies ──────────────────────────────────────────────
 echo "Installing runtime dependencies..."
@@ -42,7 +54,6 @@ sudo apt-get install -y \
     libqt6opengl6 \
     libqt6network6 \
     libqt6svg6 \
-    qt6-svg-plugins \
     qt6-wayland \
     qml6-module-qtquick \
     qml6-module-qtquick-controls \
@@ -75,18 +86,18 @@ sudo tar -xzf "${TMP_DIR}/${TARBALL}" \
 
 # ── Create launcher ────────────────────────────────────────────────────────────
 echo "Creating launcher at ${LAUNCHER}..."
-sudo tee "${LAUNCHER}" > /dev/null << 'LAUNCHER_SCRIPT'
+sudo tee "${LAUNCHER}" > /dev/null << LAUNCHER_SCRIPT
 #!/usr/bin/env bash
 # 240-MP launcher — auto-detects display platform
 INSTALL_DIR="/opt/240mp"
 
-if [ -n "${WAYLAND_DISPLAY:-}" ]; then
-    QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-wayland}"
-elif [ -n "${DISPLAY:-}" ]; then
-    QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-xcb}"
+if [ -n "\${WAYLAND_DISPLAY:-}" ]; then
+    QT_QPA_PLATFORM="\${QT_QPA_PLATFORM:-wayland}"
+elif [ -n "\${DISPLAY:-}" ]; then
+    QT_QPA_PLATFORM="\${QT_QPA_PLATFORM:-xcb}"
 else
-    # No display server — use EGLFS for headless/kiosk mode (RPi Lite)
-    QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-eglfs}"
+    # No display server — use EGLFS for headless/kiosk mode
+    QT_QPA_PLATFORM="\${QT_QPA_PLATFORM:-eglfs}"
     export QT_QPA_EGLFS_ALWAYS_SET_MODE=1
     export QT_QPA_EGLFS_KMS_ATOMIC=1
 
@@ -118,9 +129,9 @@ else
 fi
 
 export QT_QPA_PLATFORM
-export QML2_IMPORT_PATH="/usr/lib/aarch64-linux-gnu/qt6/qml"
+export QML2_IMPORT_PATH="${QML_LIB_PATH}"
 
-exec "${INSTALL_DIR}/bin/240mp" "$@"
+exec "\${INSTALL_DIR}/bin/240mp" "\$@"
 LAUNCHER_SCRIPT
 
 sudo chmod +x "${LAUNCHER}"
@@ -129,8 +140,9 @@ sudo chmod +x "${LAUNCHER}"
 echo ""
 read -r -p "Install systemd autostart service? [y/N] " REPLY
 if [[ "${REPLY}" =~ ^[Yy]$ ]]; then
-    read -r -p "Run service as user [default: pi]: " SERVICE_USER
-    SERVICE_USER="${SERVICE_USER:-pi}"
+    DEFAULT_USER="${SUDO_USER:-$(logname 2>/dev/null || echo pi)}"
+    read -r -p "Run service as user [default: ${DEFAULT_USER}]: " SERVICE_USER
+    SERVICE_USER="${SERVICE_USER:-${DEFAULT_USER}}"
 
     sudo tee "${SYSTEMD_SERVICE}" > /dev/null << UNIT
 [Unit]
@@ -145,7 +157,7 @@ AmbientCapabilities=CAP_SYS_TTY_CONFIG
 Environment=QT_QPA_PLATFORM=eglfs
 Environment=QT_QPA_EGLFS_ALWAYS_SET_MODE=1
 Environment=QT_QPA_EGLFS_KMS_ATOMIC=1
-Environment=QML2_IMPORT_PATH=/usr/lib/aarch64-linux-gnu/qt6/qml
+Environment=QML2_IMPORT_PATH=${QML_LIB_PATH}
 ExecStart=${LAUNCHER}
 Restart=on-failure
 RestartSec=5s
@@ -165,5 +177,5 @@ UNIT
 fi
 
 echo ""
-echo "240-MP ${VERSION} installed successfully."
+echo "240-MP ${VERSION} installed successfully on ${ARCH}."
 echo "Run: 240mp"

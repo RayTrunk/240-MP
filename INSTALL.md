@@ -1,4 +1,69 @@
-# Install 240-MP 
+# Install 240-MP
+
+## On Linux (x86_64 or arm64)
+
+The `install.sh` script works on any Debian 12+ or Ubuntu 22.04+ system — both x86_64 PCs and arm64 single-board computers (including Raspberry Pi).  It auto-detects your CPU architecture and downloads the matching binary.
+
+### Requirements
+
+- Debian 12 (Bookworm) / Ubuntu 22.04 or newer — tested on both architectures
+- `sudo` access
+- Internet access
+
+### Steps
+
+1. Run the installer:
+
+    ```bash
+    bash <(curl -fsSL https://github.com/RayTrunk/240-MP/releases/latest/download/install.sh)
+    ```
+
+    The script will:
+    - Detect your CPU (x86_64 or aarch64/arm64)
+    - Install the Qt6, SDL2, and mpv runtime packages via `apt`
+    - Download and extract the matching pre-built binary to `/opt/240mp`
+    - Create a `/usr/local/bin/240mp` launcher that auto-detects Wayland, X11, or headless EGLFS
+
+2. You will be asked at the end:
+
+    ```
+    Install systemd autostart service? [y/N]
+    ```
+
+    Answer `Y` to have 240-MP start automatically at boot (kiosk/appliance mode).  
+    Answer `N` to just use the `240mp` command manually.
+
+3. Start the app:
+
+    ```bash
+    240mp
+    ```
+
+### Update
+
+Re-run the same install script — your settings in `~/.local/share/240-MP/` are preserved:
+
+```bash
+bash <(curl -fsSL https://github.com/RayTrunk/240-MP/releases/latest/download/install.sh)
+```
+
+### Uninstall
+
+```bash
+sudo rm -rf /opt/240mp
+sudo rm /usr/local/bin/240mp
+```
+
+If you installed the autostart service:
+
+```bash
+sudo systemctl unmask getty@tty1.service autovt@.service
+sudo systemctl disable 240mp.service
+sudo rm /etc/systemd/system/240mp.service
+sudo systemctl daemon-reload
+```
+
+---
 
 ## On a Raspberry Pi
 

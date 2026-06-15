@@ -108,7 +108,7 @@ jobs:
           if-no-files-found: error
 
   # ──────────────────────────────────────────────────────────────────────────────
-  # Linux arm64 — targets Raspberry Pi OS Trixie (Debian 13)
+  # Linux arm64 — targets Raspberry Pi OS Trixie / Debian 12+ (arm64)
   # Uses GitHub's native arm64 runner; no QEMU needed.
   # ──────────────────────────────────────────────────────────────────────────────
   build-linux-arm64:
@@ -161,11 +161,63 @@ jobs:
           if-no-files-found: error
 
   # ──────────────────────────────────────────────────────────────────────────────
+  # Linux x86_64 — targets Debian 12+ / Ubuntu 22.04+ on standard PCs
+  # ──────────────────────────────────────────────────────────────────────────────
+  build-linux-x86_64:
+    name: Linux x86_64
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            qt6-base-dev \
+            qt6-declarative-dev \
+            libqt6svg6 \
+            qt6-svg-dev \
+            qml6-module-qtquick \
+            qml6-module-qtquick-controls \
+            qml6-module-qtquick-window \
+            libdrm-dev \
+            libssl-dev \
+            libsdl2-dev
+
+      - name: Configure
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="${GITHUB_WORKSPACE}/install/usr/local"
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Install
+        run: cmake --install build
+
+      - name: Create tarball
+        run: |
+          cd "${GITHUB_WORKSPACE}/install"
+          tar -czf "${GITHUB_WORKSPACE}/240-MP-${{ github.ref_name }}-linux-x86_64.tar.gz" .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: tarball-linux-x86_64
+          path: "240-MP-*-linux-x86_64.tar.gz"
+          if-no-files-found: error
+
+  # ──────────────────────────────────────────────────────────────────────────────
   # Publish GitHub Release
   # ──────────────────────────────────────────────────────────────────────────────
   release:
     name: Publish Release
-    needs: [build-macos-arm64, build-linux-arm64]
+    needs: [build-macos-arm64, build-linux-arm64, build-linux-x86_64]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -189,21 +241,30 @@ jobs:
           files: |
             artifacts/dmg-arm64/*.dmg
             artifacts/tarball-linux-arm64/*.tar.gz
+            artifacts/tarball-linux-x86_64/*.tar.gz
             scripts/install.sh
           body: |
             ### Downloads:
 
             | Platform | File |
             |---|---|
-            | Raspberry Pi OS Trixie (arm64) | `240-MP-${{ github.ref_name }}-linux-arm64.tar.gz` |
+            | Linux x86_64 (Debian 12+ / Ubuntu 22.04+) | `240-MP-${{ github.ref_name }}-linux-x86_64.tar.gz` |
+            | Linux arm64 (Raspberry Pi OS Trixie / Debian 12+) | `240-MP-${{ github.ref_name }}-linux-arm64.tar.gz` |
             | macOS (Apple Silicon) | `240-MP-${{ github.ref_name }}-macOS-arm64.dmg` |
 
-            ### Install Instructions:
+            ### Install (Linux — x86_64 and arm64):
 
-            - Raspberry Pi OS Trixie (arm64): [Instructions](INSTALL.md#on-a-raspberry-pi)
-            - macOS (Apple Silicon): Download the `.dmg`, open and move 240mp.app to your applications folder
+            ```bash
+            bash <(curl -fsSL https://github.com/RayTrunk/240-MP/releases/latest/download/install.sh)
+            ```
+
+            The script auto-detects your CPU architecture (`x86_64` or `aarch64`) and downloads the matching tarball.
+
+            ### Install (macOS Apple Silicon):
+
+            Download the `.dmg`, open it and move `240mp.app` into your Applications folder.
 
             ### Update Instructions:
 
-            - Raspberry Pi OS Trixie (arm64): [Instructions](INSTALL.md#update)
-            - macOS (Apple Silicon): Download the `.dmg`, open and move 240mp.app to your applications folder
+            - Linux: Re-run the install script above
+            - macOS: Download the `.dmg` and overwrite the existing app

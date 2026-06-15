@@ -36,8 +36,8 @@ SDL2 is a build-time dependency — `InputManager` links against it for USB game
 ### Get the source
 
 ```bash
-git clone https://github.com/anthonycaccese/240-mp.git
-cd 240-mp
+git clone https://github.com/RayTrunk/240-MP.git
+cd 240-MP
 ```
 
 ### Build
@@ -75,6 +75,71 @@ On macOS all user configuration is stored at:
 
 This directory is created automatically on first run. It is separate from the app itself, so deleting or rebuilding the app will not wipe your settings.
 
+## Linux x86_64 (Debian 12+ / Ubuntu 22.04+)
+
+### Prerequisites (one-time)
+
+```bash
+sudo apt-get update
+sudo apt-get install -y \
+  build-essential cmake \
+  qt6-base-dev qt6-declarative-dev \
+  qml6-module-qtquick qml6-module-qtquick-controls \
+  qml6-module-qtquick-window \
+  libqt6svg6 qt6-svg-dev qt6-svg-plugins qt6-wayland \
+  libdrm-dev libxkbcommon-dev libssl-dev \
+  libsdl2-dev \
+  mpv
+```
+
+### Get the source
+
+```bash
+git clone https://github.com/RayTrunk/240-MP.git
+cd 240-MP
+```
+
+### Build
+
+**First time, and after any CMakeLists.txt changes:**
+
+```bash
+cmake -B build
+```
+
+**For incremental builds:**
+
+```bash
+cmake --build build
+```
+
+### Run
+
+**With a desktop (X11 or Wayland):**
+
+```bash
+APP_ROOT=$(pwd) ./build/240mp
+```
+
+**Headless / kiosk (no display server, direct KMS/DRM):**
+
+```bash
+APP_ROOT=$(pwd) QT_QPA_PLATFORM=eglfs ./build/240mp
+```
+
+### Configuration
+
+On Linux all user configuration is stored at:
+
+```
+~/.local/share/240-MP/
+  config.json      ← app and module settings
+  plex_auth.json   ← plex auth
+  input.cfg        ← optional gamepad mapping overrides (see Gamepad input below)
+```
+
+---
+
 ## Raspberry Pi OS (arm64)
 
 ### Prerequisites (one-time)
@@ -99,8 +164,8 @@ sudo apt-get install -y \
 ### Get the source
 
 ```bash
-git clone https://github.com/anthonycaccese/240-mp.git
-cd 240-mp
+git clone https://github.com/RayTrunk/240-MP.git
+cd 240-MP
 ```
 
 ### Build
