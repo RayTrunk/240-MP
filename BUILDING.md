@@ -86,7 +86,7 @@ sudo apt-get install -y \
   qt6-base-dev qt6-declarative-dev \
   qml6-module-qtquick qml6-module-qtquick-controls \
   qml6-module-qtquick-window \
-  libqt6svg6 qt6-svg-dev qt6-svg-plugins qt6-wayland \
+  libqt6svg6 qt6-svg-dev qt6-wayland \
   libdrm-dev libxkbcommon-dev libssl-dev \
   libsdl2-dev \
   mpv
@@ -153,7 +153,7 @@ sudo apt-get install -y \
   qt6-base-dev qt6-declarative-dev \
   qml6-module-qtquick qml6-module-qtquick-controls \
   qml6-module-qtquick-window \
-  libqt6svg6 qt6-svg-dev qt6-svg-plugins qt6-wayland \
+  libqt6svg6 qt6-svg-dev qt6-wayland \
   libdrm-dev libxkbcommon-dev libssl-dev \
   libsdl2-dev \
   mpv
